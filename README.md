@@ -1,13 +1,25 @@
-# Sample Hardhat Project
+# Confidential Transaction on Ethereum
+Using zk-SNARKs to implement confidential transaction. Shield amount transferring in transaction.
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+# Requirements
+1. Circom
+2. Snarkjs
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
+# Circuits
+1. How to compile circuits
+```sh
+circom circuits/transfer10.circom  -o build --r1cs --wasm
+circom circuits/transfer2.circom  -o build --r1cs --wasm
 ```
+
+2. Setup proving key and verifying key
+
+3. Export verify contracts
+```sh
+snarkjs zkey export solidityverifier // TODO
+```
+
+## Use cases
+1. Salary payment
+2. Business transfer
+3. Confidential
