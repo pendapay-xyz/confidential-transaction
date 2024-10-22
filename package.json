@@ -2,9 +2,15 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "hardhat": "^2.22.13"
   },
   "dependencies": {
     "circomlib": "^2.0.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
