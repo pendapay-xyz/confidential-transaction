@@ -1,6 +1,9 @@
 # Confidential Transaction on Ethereum
 Using zk-SNARKs to implement confidential transaction. Shield amount transferring in transaction.
 
+# Docs
+1. [DESIGN](docs/DESIGN.md)
+
 # Requirements
 1. Circom
 2. Snarkjs

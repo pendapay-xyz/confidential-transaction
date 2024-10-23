@@ -10,6 +10,7 @@ template Transfer(numIns, numOuts) {
     signal input outputAmounts[numOuts];
     signal input outputSecrets[numOuts];
 
+    signal input inPublicAmount; // for deposit
     signal input outPublicAmount; // for withdraw
 
     component inCommitmentHasher[numIns];
@@ -38,5 +39,5 @@ template Transfer(numIns, numOuts) {
         sumOuts += outputAmounts[tx];
     }
 
-    sumIns === outPublicAmount + sumOuts;
+    sumIns + inPublicAmount  ===  outPublicAmount + sumOuts;
 }
