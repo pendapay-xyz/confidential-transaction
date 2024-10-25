@@ -4,7 +4,10 @@ Maskpay implement an Ethereum zk-proofs based protocol for privacy preserving pa
 > **Note:** Only amount of the payment is hidden, the sender and receiver addresses are still visible on the blockchain preventing money laundering.
 
 # How it works
+## Overview
 Maskpay using zk-SNARKs to prove the validity of a transaction without revealing the amount of the transaction. The sender creates a proof that the transaction is valid and the amount is correct. The proof is then verified by the smart contract on the blockchain.
+
+## ZK-SNARKs
 
 # Requirements
 1. Circom
