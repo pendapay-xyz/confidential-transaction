@@ -2,6 +2,7 @@
 pragma solidity 0.8.4;
 
 contract MagicPay {
+    address private _verifier2;
     mapping (bytes32 => address) internal _transactions;
 
     struct Output {
@@ -10,7 +11,7 @@ contract MagicPay {
         bytes message;
     }
 
-    function pay(bytes32[] calldata inputs, Output[] calldata outputs, uint256 outAmount) public payable {
+    function _pay(bytes32[] calldata inputs, Output[] calldata outputs, uint256 outAmount) internal {
         for (uint256 i = 0; i < inputs.length; i++) {
             require(_transactions[inputs[i]] == msg.sender, "Invalid transaction");
             delete _transactions[inputs[i]];

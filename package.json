@@ -6,7 +6,8 @@
     "hardhat": "^2.22.13"
   },
   "dependencies": {
-    "circomlib": "^2.0.5"
+    "circomlib": "^2.0.5",
+    "websnark": "^0.0.5"
   },
   "config": {
     "commitizen": {
