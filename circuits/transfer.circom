@@ -2,16 +2,16 @@ pragma circom 2.0.0;
 include "../node_modules/circomlib/circuits/poseidon.circom";
 
 template Transfer(numIns, numOuts) {
-    signal input inputNullifiers[numIns];
-    signal input inputAmounts[numIns];
-    signal input inputSecrets[numIns];
-
-    signal input outputNullifiers[numOuts];
-    signal input outputAmounts[numOuts];
-    signal input outputSecrets[numOuts];
-
     signal input inPublicAmount; // for deposit
     signal input outPublicAmount; // for withdraw
+
+    signal input inputAmounts[numIns];
+    signal input inputSecrets[numIns];
+    signal output inputNullifiers[numIns];
+
+    signal input outputAmounts[numOuts];
+    signal input outputSecrets[numOuts];
+    signal output outputNullifiers[numOuts];
 
     component inCommitmentHasher[numIns];
     var sumIns = 0;
@@ -21,7 +21,7 @@ template Transfer(numIns, numOuts) {
         inCommitmentHasher[tx].inputs[0] <== inputAmounts[tx];
         inCommitmentHasher[tx].inputs[1] <== inputSecrets[tx];
 
-        inCommitmentHasher[tx].out === inputNullifiers[tx];
+        inputNullifiers[tx] <== inCommitmentHasher[tx].out;
 
         sumIns += inputAmounts[tx];
     }
@@ -34,10 +34,10 @@ template Transfer(numIns, numOuts) {
         outCommitmentHasher[tx].inputs[0] <== outputAmounts[tx];
         outCommitmentHasher[tx].inputs[1] <== outputSecrets[tx];
 
-        outCommitmentHasher[tx].out === outputNullifiers[tx];
+        outputNullifiers[tx] <== outCommitmentHasher[tx].out;
 
         sumOuts += outputAmounts[tx];
     }
 
-    sumIns + inPublicAmount  ===  outPublicAmount + sumOuts;
+    sumIns + inPublicAmount === outPublicAmount + sumOuts;
 }
