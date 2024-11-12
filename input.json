@@ -1,8 +1,0 @@
-{
-  "inPublicAmount": "0",
-  "outPublicAmount": "0",
-  "inputAmounts": ["100000000000000000000000", "200000000000000000000000"],
-  "inputSecrets": ["1", "2"],
-  "outputAmounts": ["300000000000000000000000", "0"],
-  "outputSecrets": ["3", "1"]
-}
