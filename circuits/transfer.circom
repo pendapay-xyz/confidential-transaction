@@ -2,9 +2,6 @@ pragma circom 2.0.0;
 include "../node_modules/circomlib/circuits/poseidon.circom";
 
 template Transfer(numIns, numOuts) {
-    signal input inPublicAmount; // for deposit
-    signal input outPublicAmount; // for withdraw
-
     signal input inputAmounts[numIns];
     signal input inputSecrets[numIns];
     signal output inputNullifiers[numIns];
@@ -12,6 +9,9 @@ template Transfer(numIns, numOuts) {
     signal input outputAmounts[numOuts];
     signal input outputSecrets[numOuts];
     signal output outputNullifiers[numOuts];
+
+    signal input inPublicAmount; // for deposit
+    signal input outPublicAmount; // for withdraw
 
     component inCommitmentHasher[numIns];
     var sumIns = 0;

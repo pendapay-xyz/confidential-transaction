@@ -2,11 +2,13 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "@types/snarkjs": "^0.7.8",
     "cz-conventional-changelog": "^3.3.0",
     "hardhat": "^2.22.13"
   },
   "dependencies": {
     "circomlib": "^2.0.5",
+    "snarkjs": "^0.7.5",
     "websnark": "^0.0.5"
   },
   "config": {
