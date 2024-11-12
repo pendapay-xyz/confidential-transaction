@@ -26,4 +26,5 @@ contract MagicPay {
 
         require(IPlonkVerifier(_verifier2).verifyProof(proof, [inAmount, outAmount, uint256(inputs[0]), uint256(inputs[1]), uint256(outputs[0].encryptedAmount), uint256(outputs[1].encryptedAmount)]), "Invalid proof");
     }
+
 }
