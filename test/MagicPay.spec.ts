@@ -1,25 +1,25 @@
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
-import { Hex } from "viem";
+import { Hex, zeroAddress } from "viem";
 import hre from "hardhat";
 import { plonk } from "snarkjs";
 
-describe("ETHPay", function () {
-  async function deployETHPayFixture() {
+describe("Magicpay", function () {
+  async function deployMagicPayFixture() {
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
     const verifier2 = await hre.viem.deployContract("PlonkVerifier", [])
-    const ethPay = await hre.viem.deployContract("ETHPay", [verifier2.address]);
+    const magicPay = await hre.viem.deployContract("MagicPay", [verifier2.address]);
 
     return {
       owner,
       otherAccount,
-      ethPay,
+      magicPay,
     };
   }
 
-  describe("Deployment", function () {
+  describe("Native token", function () {
     it("should transfer", async function () {
-      const { owner, ethPay } = await loadFixture(deployETHPayFixture);
+      const { owner, magicPay } = await loadFixture(deployMagicPayFixture);
 
       let { proof, publicSignals } = await plonk.fullProve(
         {
@@ -51,21 +51,19 @@ describe("ETHPay", function () {
         {
           owner: owner.account.address,
           encryptedAmount: publicSignals[2] as Hex,
-          message: "0x",
         },
         {
           owner: owner.account.address,
           encryptedAmount: publicSignals[3] as Hex,
-          message: "0x",
         },
       ] as any;
 
-      await ethPay.write.pay2([inputs, outputs, 1000n, 0n, proof as any], {
+      await magicPay.write.pay2([zeroAddress, inputs, outputs, 1000n, 0n, proof as any, "0x"], {
         value: 1000n,
       });
 
-      const txOwner = await ethPay.read.getOwner([outputs[0].encryptedAmount])
-      console.log("New Transaction owner", txOwner)
+      const transaction = await magicPay.read.getTransaction([outputs[0].encryptedAmount])
+      console.log("New Transaction", transaction);
     });
   });
 });
