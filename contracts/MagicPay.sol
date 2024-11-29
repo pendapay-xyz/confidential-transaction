@@ -4,8 +4,10 @@ pragma solidity 0.8.4;
 import "./interfaces/IPlonkVerifier.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 contract MagicPay {
     using SafeERC20 for IERC20;
+
     struct Profile {
         bool isInit;
         bytes encryptedPrivateKey;
@@ -30,6 +32,13 @@ contract MagicPay {
         bytes32 encryptedAmount;
     }
 
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        address indexed token,
+        bytes32 encryptedAmount
+    );
+
     constructor(address verifier2) {
         _verifier2 = verifier2;
     }
@@ -47,6 +56,7 @@ contract MagicPay {
         Output[] calldata outputs,
         uint256 inAmount,
         uint256 outAmount,
+        address outReceiver,
         uint256[24] calldata proof,
         bytes memory
     ) external payable {
@@ -90,6 +100,13 @@ contract MagicPay {
                 outputs[i].owner,
                 token
             );
+
+            emit Transfer(
+                msg.sender,
+                outputs[i].owner,
+                token,
+                outputs[i].encryptedAmount
+            );
         }
 
         require(
@@ -108,10 +125,13 @@ contract MagicPay {
         );
         if (outAmount > 0) {
             if (token == address(0)) {
-                require(address(this).balance >= outAmount, "Invalid outAmount");
-                payable(msg.sender).transfer(outAmount);
+                require(
+                    address(this).balance >= outAmount,
+                    "Invalid outAmount"
+                );
+                payable(outReceiver).transfer(outAmount);
             } else {
-                IERC20(token).safeTransfer(msg.sender, outAmount);
+                IERC20(token).safeTransfer(outReceiver, outAmount);
             }
         }
     }
@@ -127,14 +147,11 @@ contract MagicPay {
         );
     }
 
-    function getProfile(address owner)
-        public
-        view
-        returns (Profile memory)
-    {
+    function getProfile(address owner) public view returns (Profile memory) {
         return _profiles[owner];
     }
 
     fallback() external payable {}
+
     receive() external payable {}
 }

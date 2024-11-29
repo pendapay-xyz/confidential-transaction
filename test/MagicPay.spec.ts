@@ -58,7 +58,7 @@ describe("Magicpay", function () {
         },
       ] as any;
 
-      await magicPay.write.pay2([zeroAddress, inputs, outputs, 1000n, 0n, proof as any, "0x"], {
+      await magicPay.write.pay2([zeroAddress, inputs, outputs, 1000n, 0n, zeroAddress, proof as any, "0x"], {
         value: 1000n,
       });
 
