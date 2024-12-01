@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.4;
 
-import "./interfaces/IPlonkVerifier.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MagicPay {
+import "./interfaces/IPlonkVerifier.sol";
+import "./FeeManager.sol";
+
+contract MagicPay is Ownable, FeeManager {
     using SafeERC20 for IERC20;
 
     struct Profile {
@@ -39,7 +42,7 @@ contract MagicPay {
         bytes32 encryptedAmount
     );
 
-    constructor(address verifier2) {
+    constructor(address verifier2, uint256 outFee, address feeReceiver) FeeManager(outFee, feeReceiver) {
         _verifier2 = verifier2;
     }
 
@@ -48,6 +51,13 @@ contract MagicPay {
         bytes memory publicKey
     ) public {
         _profiles[msg.sender] = Profile(true, encryptedPrivateKey, publicKey);
+    }
+
+    function setOutFee(uint256 outFee) public override onlyOwner {
+        _setOutFee(outFee);
+    }
+    function setFeeReceiver(address feeReceiver) public override onlyOwner {
+        _setFeeReceiver(feeReceiver);
     }
 
     function pay2(
