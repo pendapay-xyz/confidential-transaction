@@ -8,7 +8,7 @@ describe("Magicpay", function () {
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
     const verifier2 = await hre.viem.deployContract("PlonkVerifier", [])
-    const magicPay = await hre.viem.deployContract("MagicPay", [verifier2.address]);
+    const magicPay = await hre.viem.deployContract("MagicPay", [verifier2.address, 0, zeroAddress])
 
     return {
       owner,

@@ -134,14 +134,13 @@ contract MagicPay is Ownable, FeeManager {
             "Invalid proof"
         );
         if (outAmount > 0) {
+            uint256 fee = outAmount * getOutFee() / 1000;
             if (token == address(0)) {
-                require(
-                    address(this).balance >= outAmount,
-                    "Invalid outAmount"
-                );
-                payable(outReceiver).transfer(outAmount);
+                payable(outReceiver).transfer(outAmount - fee);
+                payable(getFeeReceiver()).transfer(fee);
             } else {
-                IERC20(token).safeTransfer(outReceiver, outAmount);
+                IERC20(token).safeTransfer(outReceiver, outAmount -fee);
+                IERC20(token).safeTransfer(getFeeReceiver(), fee);
             }
         }
     }

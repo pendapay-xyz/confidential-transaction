@@ -25,4 +25,12 @@ abstract contract FeeManager {
 
     function setOutFee(uint256 outFee) public virtual;
     function setFeeReceiver(address feeReceiver) public virtual;
+
+    function getOutFee() public view returns (uint256) {
+        return _outFee;
+    }
+
+    function getFeeReceiver() public view returns (address) {
+        return _feeReceiver;
+    }
 }
