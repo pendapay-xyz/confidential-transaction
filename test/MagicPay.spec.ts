@@ -7,8 +7,8 @@ describe("Magicpay", function () {
   async function deployMagicPayFixture() {
     const [owner, otherAccount] = await hre.viem.getWalletClients();
 
-    const verifier2 = await hre.viem.deployContract("PlonkVerifier", [])
-    const magicPay = await hre.viem.deployContract("MagicPay", [verifier2.address, 0, zeroAddress])
+    const verifier2 = await hre.viem.deployContract("PlonkVerifier2", [])
+    const magicPay = await hre.viem.deployContract("MagicPay", [[verifier2.address], 0, zeroAddress])
 
     return {
       owner,
@@ -30,8 +30,8 @@ describe("Magicpay", function () {
           outputAmounts: ["1000", "0"],
           outputSecrets: ["1", "0"],
         },
-        "transfer2.wasm",
-        "circuit_final.zkey",
+        "keyProve/transfer2.wasm",
+        "keyProve/circuit_final2.zkey",
       );
 
       const proofCalldata = await plonk.exportSolidityCallData(
@@ -51,14 +51,16 @@ describe("Magicpay", function () {
         {
           owner: owner.account.address,
           encryptedAmount: publicSignals[2] as Hex,
+          message: "0x"
         },
         {
           owner: owner.account.address,
           encryptedAmount: publicSignals[3] as Hex,
+          message: "0x"
         },
       ] as any;
 
-      await magicPay.write.pay2([zeroAddress, inputs, outputs, 1000n, 0n, zeroAddress, proof as any, "0x"], {
+      await magicPay.write.magicPay([zeroAddress, inputs, outputs, 1000n, 0n, zeroAddress, proof as any], {
         value: 1000n,
       });
 
