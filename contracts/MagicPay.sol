@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "hardhat/console.sol";
 
-import "./interfaces/IPlonkVerifier.sol";
+import "./interfaces/IGroth16Verifier.sol";
 import "./FeeManager.sol";
 
 contract MagicPay is Ownable, FeeManager {
@@ -18,7 +18,7 @@ contract MagicPay is Ownable, FeeManager {
         address token;
     }
 
-    address[] public verifiers;
+    address verifier;
     mapping(bytes32 => Transaction) internal _transactions;
 
     uint256 public ZERO_TX =
@@ -30,6 +30,12 @@ contract MagicPay is Ownable, FeeManager {
         bytes message;
     }
 
+    struct Proof {
+      uint[2] pA;
+      uint[2][2] pB;
+      uint[2] pC;
+    }
+
     event Transfer(
         address indexed from,
         address indexed to,
@@ -38,29 +44,7 @@ contract MagicPay is Ownable, FeeManager {
     );
 
     constructor(address[] memory verifierAddresses, uint256 outFee, address feeReceiver) FeeManager(outFee, feeReceiver) {
-        verifiers = verifierAddresses;
-    }
-
-    function _uint2str(uint _i) internal pure returns (string memory _uintAsString) {
-        if (_i == 0) {
-            return "0";
-        }
-        uint j = _i;
-        uint len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint k = len;
-        while (_i != 0) {
-            k = k-1;
-            uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-            bytes1 b1 = bytes1(temp);
-            bstr[k] = b1;
-            _i /= 10;
-        }
-        return string(bstr);
+        verifier = verifierAddresses[0];
     }
 
     function setOutFee(uint256 outFee) public override onlyOwner {
@@ -72,12 +56,12 @@ contract MagicPay is Ownable, FeeManager {
 
     function magicPay(
         address token,
-        bytes32[] calldata inputs,
-        Output[] calldata outputs,
+        bytes32[2] calldata inputs,
+        Output[2] calldata outputs,
         uint256 inAmount,
         uint256 outAmount,
         address outReceiver,
-        uint256[24] calldata proof
+        Proof memory proof
     ) external payable {
         require(inputs.length >= 2 && inputs.length <= 11, "Invalid outputs length");
         if (inAmount > 0) {
@@ -130,49 +114,22 @@ contract MagicPay is Ownable, FeeManager {
         }
 
         {
-            uint256[] memory pubSignals = new uint256[](inputs.length + 4);
+        bool isValidProof = IGroth16Verifier(verifier).verifyProof(
+          proof.pA,
+          proof.pB,
+          proof.pC,
+          [
+            uint(inputs[0]), 
+            uint(inputs[1]), 
+            uint(outputs[0].encryptedAmount),
+            uint(outputs[1].encryptedAmount),
+            inAmount, 
+            outAmount
+          ]
+        );
 
-            for (uint256 i = 0; i < inputs.length; i++) {
-                pubSignals[i] = uint256(inputs[i]);
-            }
+        require(isValidProof, "Invalid proof");
 
-            console.log("inputs.length", pubSignals.length);
-            pubSignals[inputs.length] = uint256(outputs[0].encryptedAmount);
-            pubSignals[inputs.length + 1] = uint256(outputs[1].encryptedAmount);
-            pubSignals[inputs.length + 2] = inAmount;
-            pubSignals[inputs.length + 3] = outAmount;
-
-            bytes memory encodedPubSignals;
-            assembly {
-                let size := mul(expectedLength, 0x20) // Calculate size in bytes (32 bytes per uint256)
-                encodedPubSignals := mload(0x40) // Get free memory pointer
-                mstore(encodedPubSignals, expectedLength) // Set array length
-                let dataStart := add(encodedPubSignals, 0x20)
-                for { let i := 0 } lt(i, expectedLength) { i := add(i, 1) } {
-                    mstore(add(dataStart, mul(i, 0x20)), mload(add(add(pubSignals, 0x20), mul(i, 0x20))))
-                }
-                mstore(0x40, add(encodedPubSignals, size)) // Update free memory pointer
-            }
-
-            string memory functionSignature = string(abi.encodePacked("verifyProof(uint256[24],uint256[", _uint2str(pubSignals.length), "])"));
-            console.logBytes(
-                abi.encodeWithSelector(
-                    bytes4(keccak256(abi.encodePacked(functionSignature))), 
-                    proof, 
-                    pubSignals
-                )
-            );
-            console.log(functionSignature);
-            (bool success, bytes memory data) = address(verifiers[inputs.length - 2]).staticcall(
-                abi.encodeWithSelector(
-                    bytes4(keccak256(abi.encodePacked(functionSignature))), 
-                    proof, 
-                    pubSignals
-                )
-            );
-            console.logBytes(data);
-            require(success, "Failed to call verifier");
-            require(abi.decode(data, (bool)), "Invalid proof");
         }
 
         if (outAmount > 0) {
