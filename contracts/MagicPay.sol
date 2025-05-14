@@ -60,8 +60,8 @@ contract MagicPay is Ownable, FeeManager {
         emit SetVerifier(verifierId, verifier);
     }
 
-    function setOutFee(uint256 outFee) public override onlyOwner {
-        _setOutFee(outFee);
+    function setTransactionFee(uint256 outFee) public override onlyOwner {
+        _setTransactionFee(outFee);
     }
 
     function setFeeReceiver(address feeReceiver) public override onlyOwner {
@@ -82,6 +82,7 @@ contract MagicPay is Ownable, FeeManager {
             "Invalid outputs length"
         );
         if (inAmount > 0) {
+            // Free fee if deposit transaction
             if (token == address(0)) {
                 require(msg.value == inAmount, "Invalid inAmount");
             } else {
@@ -91,6 +92,8 @@ contract MagicPay is Ownable, FeeManager {
                     inAmount
                 );
             }
+        } else {
+            require(msg.value == getTransactionFee(), "Invalid fee");
         }
         for (uint256 i = 0; i < inputs.length; i++) {
             if (inputs[i] == bytes32(ZERO_TX)) {
@@ -155,13 +158,10 @@ contract MagicPay is Ownable, FeeManager {
         }
 
         if (outAmount > 0) {
-            uint256 fee = (outAmount * getOutFee()) / 1000;
             if (token == address(0)) {
-                payable(outReceiver).transfer(outAmount - fee);
-                payable(getFeeReceiver()).transfer(fee);
+                payable(outReceiver).transfer(outAmount);
             } else {
-                IERC20(token).safeTransfer(outReceiver, outAmount - fee);
-                IERC20(token).safeTransfer(getFeeReceiver(), fee);
+                IERC20(token).safeTransfer(outReceiver, outAmount);
             }
         }
     }

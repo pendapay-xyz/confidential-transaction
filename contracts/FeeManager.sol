@@ -2,20 +2,20 @@
 pragma solidity 0.8.18;
 
 abstract contract FeeManager {
-    uint256 private _outFee;
+    uint256 private _transactionFee;
     address private _feeReceiver;
 
-    constructor(uint256 outFee, address feeReceiver) {
-        _outFee = outFee;
+    constructor(uint256 transactionFee, address feeReceiver) {
+        _transactionFee = transactionFee;
         _feeReceiver = feeReceiver;
     }
 
     event FeeChanged(uint256 newFee);
     event FeeReceiverChanged(address newFeeReceiver);
 
-    function _setOutFee(uint256 outFee) internal {
-        _outFee = outFee;
-        emit FeeChanged(outFee);
+    function _setTransactionFee(uint256 transactionFee) internal {
+        _transactionFee = transactionFee;
+        emit FeeChanged(transactionFee);
     }
 
     function _setFeeReceiver(address feeReceiver) internal {
@@ -23,11 +23,11 @@ abstract contract FeeManager {
         emit FeeReceiverChanged(feeReceiver);
     }
 
-    function setOutFee(uint256 outFee) public virtual;
+    function setTransactionFee(uint256 transactionFee) public virtual;
     function setFeeReceiver(address feeReceiver) public virtual;
 
-    function getOutFee() public view returns (uint256) {
-        return _outFee;
+    function getTransactionFee() public view returns (uint256) {
+        return _transactionFee;
     }
 
     function getFeeReceiver() public view returns (address) {
