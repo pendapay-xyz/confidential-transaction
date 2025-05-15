@@ -11,11 +11,11 @@ describe("Magicpay", function () {
 
     const verifier2 = await hre.viem.deployContract("Groth16Verifier2", []);
     const magicPay = await hre.viem.deployContract("MagicPay", [
+      verifier2.address,
+      zeroAddress,
       0,
       zeroAddress,
     ]);
-
-    await magicPay.write.setVerifier([2, verifier2.address]);
 
     return {
       owner,

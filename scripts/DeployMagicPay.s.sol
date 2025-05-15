@@ -12,8 +12,8 @@ contract DeployMagicPayScript is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
-        PlonkVerifier verifier = new PlonkVerifier();
-        MagicPay magicPay = new MagicPay(address(verifier), 0, address(0));
+        Groth16Verifier2 verifier2 = new Groth16Verifier2();
+        MagicPay magicPay = new MagicPay(verifier2, address(0) 0, vm.addr(deployerPrivateKey));
         console.log("MagicPay deployed at address: ", address(magicPay));
         vm.stopBroadcast();
     }

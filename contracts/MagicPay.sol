@@ -14,7 +14,9 @@ contract MagicPay is Ownable, FeeManager {
     using LinkedList for LinkedList.List;
     using SafeERC20 for IERC20;
 
-    mapping(uint256 => address) internal _verifiers;
+    address private _verifier2;
+    address private _verifier13;
+
     mapping(bytes32 => bytes) internal _messages;
     mapping(address => mapping(address => LinkedList.List))
         internal _transactions;
@@ -34,8 +36,6 @@ contract MagicPay is Ownable, FeeManager {
         uint[2] pC;
     }
 
-    event SetVerifier(uint256 indexed verifierId, address indexed verifier);
-
     event Transfer(
         address indexed from,
         address indexed to,
@@ -43,18 +43,27 @@ contract MagicPay is Ownable, FeeManager {
         bytes32 encryptedAmount
     );
 
+    event SetVerifier2(address verifier);
+    event SetVerifier13(address verifier);
+
     constructor(
+        address verifier2,
+        address verifier13,
         uint256 withdrawFee,
         address feeReceiver
-    ) FeeManager(withdrawFee, feeReceiver) {}
+    ) FeeManager(withdrawFee, feeReceiver) {
+        _verifier2 = verifier2;
+        _verifier13 = verifier13;
+    }
 
-    function setVerifier(
-        uint256 verifierId,
-        address verifier
-    ) public onlyOwner {
-        require(verifier != address(0), "Invalid verifier");
-        _verifiers[verifierId] = verifier;
-        emit SetVerifier(verifierId, verifier);
+    function setVerifier2(address verifier) public onlyOwner {
+        _verifier2 = verifier;
+        emit SetVerifier2(verifier);
+    }
+
+    function setVerifier13(address verifier) public onlyOwner {
+        _verifier13 = verifier;
+        emit SetVerifier13(verifier);
     }
 
     function setWithdrawFee(uint256 withdrawFee) public override onlyOwner {
@@ -120,7 +129,7 @@ contract MagicPay is Ownable, FeeManager {
 
         {
             if (inputs.length == 2) {
-                bool isValidProof = IGroth16Verifier2(_verifiers[2])
+                bool isValidProof = IGroth16Verifier2(_verifier2)
                     .verifyProof(
                         proof.pA,
                         proof.pB,
@@ -137,7 +146,7 @@ contract MagicPay is Ownable, FeeManager {
 
                 require(isValidProof, "Invalid proof");
             } else if (inputs.length == 13) {
-                bool isValidProof = IGroth16Verifier13(_verifiers[13])
+                bool isValidProof = IGroth16Verifier13(_verifier13)
                     .verifyProof(
                         proof.pA,
                         proof.pB,
@@ -186,8 +195,12 @@ contract MagicPay is Ownable, FeeManager {
         }
     }
 
-    function getVerifier(uint256 verifierId) public view returns (address) {
-        return _verifiers[verifierId];
+    function getVerifier2() public view returns (address) {
+        return _verifier2;
+    }
+
+    function getVerifier13() public view returns (address) {
+        return _verifier13;
     }
 
     function getTransactions(
