@@ -32,3 +32,5 @@ ignition/deployments/chain-31337
 build
 
 cache_forge/
+
+keys/

@@ -12,8 +12,8 @@ describe("GenerateProof", function () {
         outputAmounts: ["1000", "0"],
         outputSecrets: ["1", "0"],
       },
-      "build/transfer2_js/transfer2.wasm",
-      "build/circuit_0003.zkey",
+      "keys/transfer2_js/transfer2.wasm",
+      "keys/circuit_0003.zkey",
     );
     console.timeEnd("generate proof");
   });
