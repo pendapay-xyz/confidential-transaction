@@ -2,8 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "forge-std/Script.sol";
-import "../contracts/MagicPay.sol";
-import "../contracts/verifiers/verifier2.sol";
+import "../contracts/Profile.sol";
 
 contract DeployMagicPayScript is Script {
     function setUp() public {}
@@ -12,12 +11,11 @@ contract DeployMagicPayScript is Script {
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
 
         address deployer = vm.addr(deployerPrivateKey);
-        console.log("Deploying MagicPay contract with deployer address: ", deployer);
+        console.log("Deploying Profile contract with deployer address: ", deployer);
 
         vm.startBroadcast(deployerPrivateKey);
-        Groth16Verifier2 verifier2 = new Groth16Verifier2();
-        MagicPay magicPay = new MagicPay(address(verifier2), address(0), 1, deployer);
-        console.log("MagicPay deployed at address: ", address(magicPay));
+        Profile profile = new Profile();
+        console.log("Profile deployed at address: ", address(profile));
         vm.stopBroadcast();
     }
 }
