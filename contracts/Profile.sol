@@ -10,4 +10,8 @@ contract Profile {
         _profiles[msg.sender][key] = value;
         emit ProfileUpdated(msg.sender, key, value);
     }
+
+    function getProfile(address user, bytes32 key) public view returns (bytes memory) {
+        return _profiles[user][key];
+    }
 }

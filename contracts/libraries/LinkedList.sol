@@ -105,7 +105,9 @@ library LinkedList {
     /// @param maxCount Maximum number of nodes to traverse
     /// @return ids Array of traversed IDs (length <= maxCount)
     function traverse(List storage list, bytes32 start, uint256 maxCount) internal view returns (bytes32[] memory) {
-        require(contains(list, start), "LinkedList: start not in list");
+        if (!contains(list, start)) {
+            return new bytes32[](0);
+        }
 
         // Determine actual number of nodes to traverse
         uint256 actualCount = 0;
